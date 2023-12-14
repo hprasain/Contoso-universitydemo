@@ -1,0 +1,25 @@
+name: Deploy Contoso_Demo
+ 
+on:
+  workflow_run:
+    workflows: ["Pack Contoso_Demo"]
+    branches: [main]
+    types:
+      - completed
+  workflow_dispatch:
+ 
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    environment: Production
+    steps:
+      - uses: dawidd6/action-download-artifact@v2
+        with:
+          workflow: pack-solution.yml
+          name: packed-solution
+      - uses: microsoft/powerplatform-actions/import-solution@v0
+        with:
+          environment-url: https://org9ddfe983.crm8.dynamics.com/
+          user-name: ${{ secrets.USERNAME }}
+          password-secret: ${{ secrets.PASSWORD }}
+          solution-file: adoSrcSolutionzip
